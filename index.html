@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Stock Barang - Inventory Management</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header>
+    <div class="header-top">
+      <div>
+        <h1>📦 Stock Barang</h1>
+        <p class="header-subtitle">Inventory Management System</p>
+      </div>
+      <button id="logoutBtn" class="btn btn-secondary" style="display: none">Logout</button>
+    </div>
+    <p id="welcomeMsg" class="welcome-message" style="display: none"></p>
+  </header>
+
+  <div id="authContainer" class="auth-container">
+    <div class="card auth-card">
+      <div class="auth-note">
+        📌 Demo: admin@admin.com / admin123
+      </div>
+
+      <div id="loginPanel" class="auth-panel active">
+        <div class="auth-header">
+          <h2>Welcome Back</h2>
+          <p>Sign in to your account</p>
+        </div>
+        <form onsubmit="handleLogin(event)">
+          <div class="field-row">
+            <label for="loginEmail">Email</label>
+            <input type="email" id="loginEmail" placeholder="admin@admin.com" required />
+          </div>
+          <div class="field-row">
+            <label for="loginPassword">Password</label>
+            <input type="password" id="loginPassword" placeholder="Enter password" required />
+          </div>
+          <div class="actions">
+            <button type="submit" class="btn btn-primary">Login</button>
+          </div>
+        </form>
+      </div>
+
+      <div class="auth-divider">
+        <p>Don't have an account? <button type="button" class="link-btn" onclick="switchAuth('register')">Register here</button></p>
+      </div>
+
+      <div id="registerPanel" class="auth-panel">
+        <div class="auth-header">
+          <h2>Create Account</h2>
+          <p>Register a new account</p>
+        </div>
+        <form onsubmit="handleRegister(event)">
+          <div class="field-row">
+            <label for="regName">Full Name</label>
+            <input type="text" id="regName" placeholder="Your name" required />
+          </div>
+          <div class="field-row">
+            <label for="regEmail">Email</label>
+            <input type="email" id="regEmail" placeholder="your@email.com" required />
+          </div>
+          <div class="field-row">
+            <label for="regPassword">Password</label>
+            <input type="password" id="regPassword" placeholder="Create password" required />
+          </div>
+          <div class="actions">
+            <button type="submit" class="btn btn-primary">Register</button>
+          </div>
+        </form>
+        <p style="text-align: center; margin-top: 16px; color: var(--text-muted);">
+          Already have an account? <button type="button" class="link-btn" onclick="switchAuth('login')">Login here</button>
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <div id="appContainer" style="display: none">
+    <div class="card profile-card" style="margin-top: 20px">
+      <div class="profile-row">
+        <div>
+          <p class="profile-label">Current User</p>
+          <strong id="userName"></strong>
+          <p id="userRole" class="profile-note"></p>
+        </div>
+      </div>
+    </div>
+
+    <div id="adminPanel" style="display: none">
+      <div class="card admin-card">
+        <div class="admin-header">
+          <h2>📊 Admin Dashboard</h2>
+          <p>System statistics and user management</p>
+        </div>
+
+        <div class="admin-grid">
+          <div class="admin-metric">
+            <p class="admin-label">Total Users</p>
+            <strong id="totalUsers">0</strong>
+          </div>
+          <div class="admin-metric">
+            <p class="admin-label">Total Items</p>
+            <strong id="totalItems">0</strong>
+          </div>
+          <div class="admin-metric">
+            <p class="admin-label">Total Stock Value</p>
+            <strong id="totalValue">Rp 0</strong>
+          </div>
+        </div>
+
+        <div class="admin-users-section">
+          <h3>Users List</h3>
+          <div class="list-card">
+            <div class="table-wrapper">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Role</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="adminUsersList"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <main>
+      <div class="card form-card">
+        <h2 id="formTitle">Add New Item</h2>
+        <form onsubmit="handleAddItem(event)">
+          <div class="field-row">
+            <label for="itemName">Item Name</label>
+            <input type="text" id="itemName" placeholder="Product name" required />
+          </div>
+          <div class="field-row">
+            <label for="itemSku">SKU</label>
+            <input type="text" id="itemSku" placeholder="ABC-001" required />
+          </div>
+          <div class="field-row">
+            <label for="itemQty">Quantity</label>
+            <input type="number" id="itemQty" placeholder="0" required />
+          </div>
+          <div class="field-row">
+            <label for="itemPrice">Price</label>
+            <input type="number" id="itemPrice" placeholder="0" required />
+          </div>
+          <div class="field-row">
+            <label for="itemCategory">Category</label>
+            <input type="text" id="itemCategory" placeholder="Electronics, Furniture, etc" required />
+          </div>
+          <div class="actions">
+            <button type="submit" class="btn btn-primary" id="submitBtn">Add Item</button>
+            <button type="button" class="btn btn-secondary" id="cancelBtn" onclick="cancelEdit()" style="display: none">Cancel Edit</button>
+          </div>
+        </form>
+      </div>
+
+      <div class="card list-card">
+        <div class="list-header">
+          <h2>Items List</h2>
+          <input type="search" id="searchBox" placeholder="Search by name or SKU..." />
+        </div>
+        <div class="stats">
+          <span>📦 <span id="itemCount">0</span> items</span>
+          <span>💰 Total Value: <span id="totalPrice">Rp 0</span></span>
+        </div>
+        <div class="table-wrapper">
+          <table>
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>SKU</th>
+                <th>Category</th>
+                <th>Quantity</th>
+                <th>Price</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="itemsList"></tbody>
+          </table>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <footer>
+    <p>&copy; 2024 Stock Barang - Inventory Management System</p>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
